@@ -2,22 +2,21 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import com.opencsv.CSVReader;
+import java.io.PrintWriter;
+import java.io.BufferedReader;  
 
 public class Main {
-    private final static String strNumbersPathname = "Numbers.csv";
-    private final static String strResultsPathname = "Results.csv";    
-    private static double[] arrDouble; 
-    private final static int[] nNCounts = {10, 100, 1000, 10000};
-    private static File fNumbers;
-    private static FileReader frNumbers;
-    private static FileWriter fwNumbers;
-    private static CSVReader reader = null;  
-    private static File fResults;
-    private static FileWriter fwResults;
+    private final String strNumbersPathname = "Numbers.csv";
+    private final String strResultsPathname = "Results.csv";    
+    private double[] arrDouble; 
+    private final int[] nNCounts = {10, 100, 1000, 10000};
+    private FileReader frNumbers;
+    private PrintWriter pwNumbers;
+    private File fResults;
+    private FileWriter fwResults;
+    private String strSplitBy = ",";
 
-    private static void writeArrToResults () throws IOException
+    private  void writeArrToResults () throws IOException
     {
         for(int i=1; i<=NumbersGenerator.N; i++)
         {
@@ -25,33 +24,58 @@ public class Main {
         }
     }
 
-    private static void resetDoubles (int N) throws IOException
+    private void resetDoubles (int N) throws IOException
     {
-        frwNumbers.seek(0);
-        arrDouble = new double[NumbersGenerator.N+1];
-        for (int i=1; i<=N; i++)
-        {
-            System.out.print(i);
-            arrDouble[i]=frwNumbers.readDouble();
-            System.out.print(": "+arrDouble + ", ");
+        BufferedReader brNumbers = new BufferedReader(frNumbers);
+        System.out.println("%%%%%%%%%%%%%%" + brNumbers.readLine());
 
+        String strTemp = new String();
+        
+        arrDouble = new double[NumbersGenerator.N+1];
+        if((strTemp=brNumbers.readLine()) != null)
+        {
+            String[] strTempLine = brNumbers.readLine().split(strSplitBy);
+            for (int i=1; i<=N; i++)
+            {
+                System.out.print(i);
+                arrDouble[i]=Double.parseDouble(strTempLine[i-1]);
+                System.out.print(": "+arrDouble + ", ");
+            }
         }
+        else
+        {
+            System.out.println("Null Buffered Reader");
+        }
+        
+        brNumbers.close();
+
     }
 
-    public static void run () throws IOException
+    public void run () throws IOException
     {
-        frwNumbers = new RandomAccessFile (strNumbersPathname, "rw");
-
-        fResults = new File(strResultsPathname);
-        fwResults = new FileWriter(fResults);
+        pwNumbers = new PrintWriter(strNumbersPathname);
         
         // Generate Random Real Numbers
         arrDouble = new double[NumbersGenerator.N+1];
         arrDouble = NumbersGenerator.generateRandomReal();
+
+        StringBuilder strbDoubles = new StringBuilder();
         for(int i=1; i<=NumbersGenerator.N; i++)
         {
-            frwNumbers.writeChars(arrDouble[i]+",");
+            strbDoubles.append(arrDouble[i]+",");
+            System.out.println(arrDouble[i]+",");
         }
+        pwNumbers.write(strbDoubles.toString());
+        pwNumbers.close();
+
+        frNumbers = new FileReader(strNumbersPathname);
+        fResults = new File(strResultsPathname);
+        fwResults = new FileWriter(fResults);
+
+        System.out.println(strbDoubles);
+        BufferedReader brNumbers = new BufferedReader(frNumbers);
+        System.out.println("$$$$$$$$$$$" + brNumbers.readLine());
+        strbDoubles = null;
         
 
 
@@ -70,11 +94,14 @@ public class Main {
         
 
         fwResults.close();  // Close Results File Reader
-        frwNumbers.close();  // Close Numbers File Reader&Writer
+        frNumbers.close();  // Close Numbers File Reader&Writer
+        
     }
 
     public static void main(String[] args) throws IOException
     {
-        Main.run();
+
+        Main mMain = new Main();
+        mMain.run();
     }
 }
