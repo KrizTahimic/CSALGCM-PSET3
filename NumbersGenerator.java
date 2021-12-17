@@ -1,9 +1,8 @@
 import java.util.Random;
 
 public class NumbersGenerator {
-    public final static int N = 10;
 
-    public static double[] generateRandomReal()
+    public static double[] generateRandomReal(int N)
     {
         double[] arrDouble = new double[N+1]; // +1 bec req to start with index 1
         double fUpperBound = (double)1.0;
