@@ -9,10 +9,14 @@ class InsertionSort
         for (j = 2; j <= N; j++)
         { 
             key = number[j];
-            for (i = j-1; i>0 && number[i] > key; i--)
+            for (i = j-1; i>0 ; i--)
             {
                 lInsertionSortCtr++;
-                number[i+1] = number[i];
+                if(number[i] > key)
+                {
+                    number[i+1] = number[i];
+                }
+                
             }
             number[i+1] = key;
         }
